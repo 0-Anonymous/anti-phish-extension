@@ -48,4 +48,35 @@ Built using **Manifest V3**, **JavaScript**, and **secure content scripting**, t
 ---
 
 ## 🗂️ Project Structure
-
+Anti-Phish/
+├─ .github/
+│ └─ workflows/
+│ ├─ ci.yml
+│ ├─ ISSUE_TEMPLATE.md
+│ └─ PULL_REQUEST_TEMPLATE.md
+├─ demo/
+│ ├─ phishing-sample.html
+│ └─ run-demo.sh
+├─ docs/
+│ └─ demo.gif
+├─ icons/
+│ ├─ icon16.png
+│ ├─ icon48.png
+│ └─ icon128.png
+├─ scripts/
+│ └─ validate-manifest.js
+├─ src/
+│ ├─ background.js
+│ ├─ content.js
+│ ├─ popup.html
+│ └─ popup.js
+├─ Tests/
+│ ├─ Cases
+│ ├─ Manual test
+│ └─ TESTRESULTS.md
+├─ manifest.json
+├─ README.md
+├─ LICENSE
+├─ SECURITY.md
+├─ CONTRIBUTING.md
+└─ HIGHLIGHTS.md
