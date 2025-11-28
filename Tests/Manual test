@@ -1,0 +1,88 @@
+-----------------------------------------
+ANTI-PHISH EXTENSION – MANUAL TEST PROTOCOL
+-----------------------------------------
+
+# Step 1: Load Extension
+1. Open chrome://extensions
+2. Enable “Developer Mode”
+3. Click “Load Unpacked”
+4. Select Anti-Phish main folder
+
+Expected: Extension loads successfully with icon visible.
+
+-----------------------------------------------------
+
+# Step 2: Open Demo Phishing Page
+File: /demo/phishing-sample.html  
+URL example:  
+file:///D:/Anti-Phishing/demo/phishing-sample.html
+
+Expected:
+- Red warning banner appears automatically
+- Background logs: “contains credential form”
+
+-----------------------------------------------------
+
+# Step 3: Test Dismiss
+1. Click “Dismiss”
+Expected: Banner disappears.
+
+2. Open popup → click “Scan tab”
+Expected: Banner reappears.
+
+-----------------------------------------------------
+
+# Step 4: Safe Sites Test
+Visit:
+- https://google.com
+- https://github.com
+
+Expected:
+- No banner
+- Background logs: “no issues found”
+
+-----------------------------------------------------
+
+# Step 5: Suspicious URL Test
+Visit:  
+https://secure-login.example.com  
+https://account-verify-example.net
+
+Expected:
+- Should be flagged based on heuristic match
+
+-----------------------------------------------------
+
+# Step 6: Popup Functionality
+1. Click “Scan Tab”  
+2. Check popup status message
+
+Expected:
+- “Scanning tab…”
+- then “Scan completed”
+- Banner appears if page contains form
+
+-----------------------------------------------------
+
+# Step 7: Background Console Verification
+Open service worker console:
+
+chrome://extensions → Inspect views → service worker
+
+Expected logs:
+- “background service worker starting”
+- “running checks”
+- “sent showWarning”
+- “no issues found” for safe URLs
+
+-----------------------------------------------------
+
+# Step 8: Code Reload Persistence
+1. Reload extension  
+2. Reopen demo page
+
+Expected: Banner still works normally.
+
+-----------------------------------------------------
+
+End of manual test protocol.

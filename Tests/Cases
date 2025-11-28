@@ -1,0 +1,73 @@
+-----------------------------------------
+ANTI-PHISH EXTENSION – TEST CASES
+-----------------------------------------
+
+# 1. URL Heuristic Tests
+1.1 Suspicious subdomain detection  
+    URL: https://secure-login.example.com  
+    Expect: Flagged as suspicious (contains phishing-style subdomain)
+
+1.2 Known phishing keyword in hostname  
+    URL: https://account-verify-example.net  
+    Expect: Flagged (keyword match: “verify”)
+
+1.3 Safe domain should not be flagged  
+    URL: https://google.com  
+    Expect: No warning
+
+1.4 Local file phishing demo  
+    URL: file:///demo/phishing-sample.html  
+    Expect: Flagged (contains credential form)
+
+-----------------------------------------------------
+
+# 2. DOM Credential Form Tests
+2.1 Page contains a login form  
+    Form fields: email + password  
+    Expect: Immediate banner injected ("contains credential form")
+
+2.2 Page contains only username field  
+    Expect: No flag
+
+2.3 Page contains multiple sensitive input fields  
+    Expect: Flagged
+
+-----------------------------------------------------
+
+# 3. Popup “Scan Tab” Button
+3.1 Clicking Scan Tab on a suspicious page  
+    Expect:  
+        - Status updates to “Scanning…”  
+        - Warning sent if credential form exists  
+        - Popup displays “scan completed”
+
+3.2 Clicking Scan Tab on a normal page  
+    Expect: “No issues found”
+
+3.3 After clicking “Dismiss” → Scan Tab again  
+    Expect: Warning banner reappears
+
+-----------------------------------------------------
+
+# 4. Error Handling
+4.1 chrome:// or chrome-extension:// pages  
+    Expect: Skipped (non-injectable URL)
+
+4.2 New tabs / blank pages  
+    Expect: Skipped
+
+4.3 Disallowed pages  
+    Expect: “Skipping DOM checks” in console
+
+-----------------------------------------------------
+
+# 5. Persistence
+5.1 After reloading extension  
+    Expect: All features still work (tested)
+
+5.2 After reopening the browser  
+    Expect: Background worker starts and logs initialization
+
+-----------------------------------------------------
+
+End of testcase list.
