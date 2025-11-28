@@ -11,14 +11,14 @@
       status.textContent = 'Status: no active tab';
       return;
     }
-    chrome.runtime.sendMessage({ action: 'manualScan', url: tab.url }, (resp) => {
+    chrome.runtime.sendMessage({ action: 'manualScan' }, (resp) => {
+      console.log('popup: manualScan resp', resp);
       if (resp?.ok) status.textContent = 'Status: scan completed';
-      else status.textContent = 'Status: scan failed';
+      else status.textContent = `Status: scan failed (${resp?.error || 'unknown'})`;
     });
   });
 
   reportBtn.addEventListener('click', async () => {
-    // open issues link for this repo
     const url = 'https://github.com/0-Anonymous/anti-phish-extension/issues/new';
     chrome.tabs.create({ url });
   });

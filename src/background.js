@@ -1,10 +1,9 @@
 // src/background.js
+console.log('Anti-Phish: background service worker starting');
 
-// Default blocklist & heuristics (you can extend from storage)
 const DEFAULT_BLOCKLIST = ["example-phish.com", "malicious-example.org"];
 const SUSPICIOUS_KEYWORDS = ["login-", "secure-", "account-", "verify-", "update-"];
 
-// Load blocklist from storage
 async function getBlocklist() {
   return new Promise((resolve) => {
     chrome.storage.local.get({ blocklist: DEFAULT_BLOCKLIST }, (items) => {
@@ -21,11 +20,9 @@ function hostnameFromUrl(url) {
   }
 }
 
-// Heuristic check
 async function analyzeUrl(url) {
   const host = hostnameFromUrl(url);
   const blocklist = await getBlocklist();
-
   if (!host) return { hit: false };
 
   if (blocklist.includes(host)) return { hit: true, reason: 'blocklist match' };
@@ -39,7 +36,6 @@ async function analyzeUrl(url) {
   return { hit: false };
 }
 
-// Check page for credential form by running a small content function
 async function pageHasCredentialForm(tabId) {
   try {
     const results = await chrome.scripting.executeScript({
@@ -55,12 +51,37 @@ async function pageHasCredentialForm(tabId) {
       return r.hasPassword && r.hasForm;
     }
   } catch (e) {
-    console.error('pageHasCredentialForm error', e);
+    console.error('Anti-Phish: pageHasCredentialForm error', e);
   }
   return false;
 }
 
+async function showWarning(tabId, reason) {
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      func: () => true
+    });
+
+    chrome.tabs.sendMessage(tabId, { action: 'showWarning', reason }, () => {});
+    console.log(`Anti-Phish: sent showWarning to tab ${tabId} (${reason})`);
+  } catch (e) {
+    console.error('Anti-Phish: showWarning error', e);
+    try {
+      // fallback: inject content script then message
+      await chrome.scripting.executeScript({
+        target: { tabId },
+        files: ['src/content.js']
+      });
+      chrome.tabs.sendMessage(tabId, { action: 'showWarning', reason }, () => {});
+    } catch (err) {
+      console.error('Anti-Phish: fallback injection failed', err);
+    }
+  }
+}
+
 async function runChecks(tabId, url) {
+  console.log(`Anti-Phish: running checks for tab ${tabId} url=${url}`);
   const analysis = await analyzeUrl(url);
   if (analysis.hit) {
     await showWarning(tabId, analysis.reason);
@@ -72,48 +93,33 @@ async function runChecks(tabId, url) {
     await showWarning(tabId, 'contains credential form');
     return;
   }
+
+  console.log(`Anti-Phish: no issues found for tab ${tabId}`);
 }
 
-// Send message to the content script to show warning
-async function showWarning(tabId, reason) {
-  try {
-    // ensure content script exists in that tab by executing a no-op script first
-    await chrome.scripting.executeScript({
-      target: { tabId },
-      func: () => true
-    });
-
-    chrome.tabs.sendMessage(tabId, { action: 'showWarning', reason }, () => {});
-  } catch (e) {
-    // If we can't execute script, try injecting content.js and then message
-    try {
-      await chrome.scripting.executeScript({
-        target: { tabId },
-        files: ['src/content.js']
-      });
-      chrome.tabs.sendMessage(tabId, { action: 'showWarning', reason }, () => {});
-    } catch (err) {
-      console.error('showWarning error', err);
-    }
-  }
-}
-
-// Listen to tab updates
+// Run checks when a tab finishes loading
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== 'complete' || !tab?.url) return;
   runChecks(tabId, tab.url).catch(console.error);
 });
 
-// Manual scan from popup
+// Manual scan handler — queries active tab (works when message comes from popup)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.action === 'manualScan' && message?.url && sender?.tab?.id) {
-    runChecks(sender.tab.id, message.url).then(() => {
-      sendResponse({ ok: true });
-    }).catch((err) => {
-      console.error(err);
-      sendResponse({ ok: false, error: err?.message });
+  if (message?.action === 'manualScan') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs && tabs[0];
+      if (!tab || !tab.id) {
+        sendResponse({ ok: false, error: 'no active tab' });
+        return;
+      }
+      runChecks(tab.id, tab.url).then(() => {
+        sendResponse({ ok: true });
+      }).catch((err) => {
+        console.error('Anti-Phish: manualScan error', err);
+        sendResponse({ ok: false, error: err?.message });
+      });
     });
-    // indicate async response
+    // indicate we will call sendResponse asynchronously
     return true;
   }
 });

@@ -1,7 +1,10 @@
 // src/content.js
 const BANNER_ID = 'anti-phish-banner-v1';
 
+console.log('Anti-Phish: content script loaded on', location.href);
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('Anti-Phish: content received message', message);
   if (message?.action === 'showWarning') {
     displayWarning(message.reason || '');
     sendResponse({ ok: true });
