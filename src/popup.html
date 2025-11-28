@@ -1,24 +1,28 @@
-<!-- src/popup.html -->
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Anti-Phish</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: Arial, sans-serif; width: 260px; padding: 12px; }
-    h2 { font-size: 16px; margin: 0 0 8px; }
-    button { padding: 8px 10px; cursor: pointer; margin-right: 8px; }
-    .status { margin-top: 12px; font-size: 13px; color: #333; }
+    body { font-family: Arial, sans-serif; font-size: 14px; margin: 8px; }
+    #container { width: 220px; }
+    button { margin-right: 8px; padding: 6px 10px; }
+    #status { margin-top: 8px; color: #333; }
   </style>
 </head>
 <body>
-  <h2>Anti-Phish</h2>
-  <div>
-    <button id="scan">Scan tab</button>
-    <button id="report">Report</button>
+  <div id="container">
+    <h3 style="margin:0 0 8px 0;">Anti-Phish</h3>
+    <div>
+      <button id="scan">Scan tab</button>
+      <button id="report">Report</button>
+    </div>
+    <div id="status">Status: Idle</div>
   </div>
-  <div class="status" id="status">Status: Idle</div>
 
-  <script src="src/popup.js"></script>
+  <!-- IMPORTANT: script path is relative to popup.html location.
+       If popup.html lives in src/ and popup.js is in src/, use popup.js -->
+  <script src="popup.js"></script>
 </body>
 </html>

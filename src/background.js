@@ -168,6 +168,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 // Manual scan handler — queries active tab (works when message comes from popup)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('background: received message', message, 'sender=', sender);
   if (message?.action === 'manualScan') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs && tabs[0];
@@ -182,7 +183,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: false, error: err?.message });
       });
     });
-    // indicate we will call sendResponse asynchronously
-    return true;
+    return true; // keep sendResponse alive
   }
 });
+
