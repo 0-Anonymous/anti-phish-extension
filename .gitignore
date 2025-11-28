@@ -1,0 +1,41 @@
+# Node / JS
+node_modules/
+npm-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Build / release artifacts
+dist/
+build/
+*.zip
+*.crx
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+
+# System files
+.env
+.env.local
+.env.*.local
+
+# IDE specific (JetBrains)
+.idea/
+
+# Misc
+coverage/
+.nyc_output/
+
+# Keep icons and src tracked (do NOT ignore them)
+# icons/
+# src/
+# manifest.json
