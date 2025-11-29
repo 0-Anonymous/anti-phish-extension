@@ -40,9 +40,6 @@ Built using **Manifest V3**, **JavaScript**, and **secure content scripting**, t
 
 ## 📸 Demo (GIF Placeholder)
 
-> 🔧 Place your demo GIF inside: `docs/demo.gif`  
-> Then update this line:
-
 ![demo](docs/demo.gif)
 
 ---
